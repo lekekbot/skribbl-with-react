@@ -1,7 +1,10 @@
 const express = require('express')
 const cors = require('cors');
 const http = require('http');
+const randomatic = require('randomatic');
 const app = express()
+const { addUser, getUser, deleteUser, getUsers } = require('./users')
+
 
 const server = http.createServer(app)
 const io = require('socket.io')(server, {
@@ -13,12 +16,38 @@ const io = require('socket.io')(server, {
 const sockets = io => {
     io.on('connection', (socket) => {
         //store id
-        socket.on('send-id', async (data) => {
-            clientInfo = {
-                userid: data.userid,
-                socketid: data.socketid
-            }
-            clients.push(clientInfo)
+        socket.on('create-room', async (data, callback) => {
+            let randomizedCode = randomatic('aA0', 8);
+            let username = data.username
+
+            const {user, error } = addUser(socket.id, username, randomizedCode)
+            if (error) return callback(error,null)
+
+            socket.join(randomizedCode)
+
+            // return socket.emit('room-created', {
+            //     code: randomizedCode,
+            //     username: username,
+            // })
+            callback(null, {
+                code: randomizedCode,
+                username: username,
+            })
+        })
+
+        socket.on('join-room', async (data) => {
+            let code = data.room
+            socket.join(code)
+            
+            return socket.to(code).emit('message','yes')
+        })
+
+        //get users 
+        socket.on('users', (data)=> {
+            let room = data.room
+            console.log(getUsers(room))
+            io.emit('return-users', getUsers(room))
+
         })
     })
 }

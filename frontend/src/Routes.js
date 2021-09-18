@@ -1,29 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import {Route, BrowserRouter as Router, Switch, Redirect} from 'react-router-dom';
+import { MainProvider } from './Context/mainContext';
+import { UsersProvider } from './Context/usersContext';
 
 //pages
 import Home from './Pages/Home/Home'
 import Room from './Pages/Room/Room';
-import {Route, BrowserRouter as Router, Switch, Redirect} from 'react-router-dom';
+import WaitingRoom from './Pages/WaitingRoom/WaitingRoom'
 
 const Routes = props => {
   return (
-    <Router {...props}>
-      <Switch>
-        <Route exact path="/home">
-          <Home/>  
-        </Route>
+    <MainProvider>
+      <UsersProvider>
+        <Router {...props}>
+          <Switch>
+            <Route exact path="/home">
+              <Home/>  
+            </Route>
 
-        <Route path="/room">
-          <Room/>
-        </Route>
+            <Route path="/room">
+              <Room/>
+            </Route>
 
-        <Route path="*">
-          <Home />
-        </Route>
 
-      </Switch>
-    </Router>
+            <Route path="/waiting-room">
+              <WaitingRoom/>
+            </Route>
+
+            <Route path="*">
+              <Home />
+            </Route>
+            
+          </Switch>
+        </Router>
+      </UsersProvider>
+    </MainProvider>
   )
 }
 
