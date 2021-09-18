@@ -19,20 +19,6 @@ export default function WaitingRoom() {
     const {users, setUsers} = useContext(UsersContext)
     const {name, setName, room, setRoom} = useContext(MainContext)
     const [html, setHTML] = useState([])
-    
-    useEffect(() => {
-        //get users 
-        socket.emit('users', {
-            room: room
-        })
-
-        socket.on('return-users', users => {
-            console.log(users)
-            console.log('yes')
-            // setUsers(users)
-        })
-    })
-
 
     //useeffect to get users, on etc. etc.
     return (

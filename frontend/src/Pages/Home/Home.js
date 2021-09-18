@@ -37,12 +37,6 @@ export default function Home() {
             setUsers(users)
         })
     })
-    
-    useEffect(() => {   
-        socket.on('message', (data) => {
-            console.log(data)
-        })
-    })
 
     const username = useRef(null)
     const roomCode = useRef(null)
@@ -69,6 +63,17 @@ export default function Home() {
         socket.emit('join-room', {
             username: name,
             room: room,
+        }, (err, data) => {
+            if(err) {
+                console.log(err)
+                return Toast.fire({
+                    icon: 'error',
+                    title: 'Cannot join room'
+                })
+            }
+            setRoom(data.code)
+            setName(data.username)
+            history.push('/waiting-room')
         })
         //emit socket to join room
     }

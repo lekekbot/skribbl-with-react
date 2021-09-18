@@ -21,7 +21,7 @@ const sockets = io => {
             let randomizedCode = randomatic('aA0', 8);
             let username = data.username
 
-            const {user, error } = addUser(socket.id, username, randomizedCode)
+            const { user, error } = addUser(socket.id, username, randomizedCode)
             if (error) return callback(error,null)
 
             socket.join(randomizedCode)
@@ -35,27 +35,20 @@ const sockets = io => {
         })
 
         //join room
-        socket.on('join-room', async (data) => {
+        socket.on('join-room', async (data, callback) => {
             let room = data.room
             let username = data.username
 
-            socket.join(room)
-            const {user, error } = addUser(socket.id, username, room)
-            console.log(room)
+            const { user, error } = addUser(socket.id, username, room)
+            if (error) return callback(error,null)
             
-            console.log(getUsers(room))
+            socket.join(room)
             io.in(room).emit('users', getUsers(room))
-            io.in(room).emit('return-users',{help: 'yes'})
-        })
 
-        //get users 
-        socket.on('users', (data)=> {
-            let room = data.room
-
-            console.log(getUsers(room))
- 
-            io.in(room).emit('return-users',{help: 'yes'})
-
+            callback(null, {
+                code: room,
+                username: username,
+            })
         })
     })
 }
