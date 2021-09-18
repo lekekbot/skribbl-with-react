@@ -1,6 +1,7 @@
 import {Route, BrowserRouter as Router, Switch, Redirect} from 'react-router-dom';
 import { MainProvider } from './Context/mainContext';
 import { UsersProvider } from './Context/usersContext';
+import { SocketProvider } from './Context/socketContext';
 
 //pages
 import Home from './Pages/Home/Home'
@@ -12,31 +13,33 @@ const Routes = props => {
   return (
     <MainProvider>
       <UsersProvider>
-        <Router {...props}>
-          <Switch>
-            <Route exact path="/home">
-              <Home/>  
-            </Route>
+        <SocketProvider>
+          <Router {...props}>
+            <Switch>
+              <Route exact path="/home">
+                <Home/>  
+              </Route>
 
-            <Route path="/room">
-              <Room/>
-            </Route>
+              <Route path="/room">
+                <Room/>
+              </Route>
 
 
-            <Route path="/waiting-room">
-              <WaitingRoom/>
-            </Route>
+              <Route path="/waiting-room">
+                <WaitingRoom/>
+              </Route>
 
-            <Route path="/CanvasTest">
-              <CanvasTest/>
-            </Route>
+              <Route path="/CanvasTest">
+                <CanvasTest/>
+              </Route>
 
-            <Route path="*">
-              <Home />
-            </Route>
-            
-          </Switch>
-        </Router>
+              <Route path="*">
+                <Home />
+              </Route>
+              
+            </Switch>
+          </Router>
+        </SocketProvider>
       </UsersProvider>
     </MainProvider>
   )

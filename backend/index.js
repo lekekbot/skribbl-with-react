@@ -3,7 +3,7 @@ const cors = require('cors');
 const http = require('http');
 const randomatic = require('randomatic');
 const app = express()
-const { addUser, getUser, deleteUser, getUsers, gay } = require('./users')
+const { addUser, getUser, deleteUser, getUsers } = require('./users')
 
 
 const server = http.createServer(app)
@@ -18,13 +18,13 @@ const sockets = io => {
 
         //create room
         socket.on('create-room', async (data, callback) => {
-            let randomizedCode = randomatic('aA0', 8);
+            let randomizedCode = randomatic('A0', 8);
             let username = data.username
 
-            const { user, error } = addUser(socket.id, username, randomizedCode)
+            const { user, error } = addUser(socket.id, username, randomizedCode, true)
             if (error) return callback(error,null)
 
-            socket.join(randomizedCode)
+            await socket.join(randomizedCode)
             io.in(randomizedCode).emit('users', getUsers(randomizedCode))
 
             callback(null, {
@@ -42,7 +42,7 @@ const sockets = io => {
             const { user, error } = addUser(socket.id, username, room)
             if (error) return callback(error,null)
             
-            socket.join(room)
+            await socket.join(room)
             io.in(room).emit('users', getUsers(room))
 
             callback(null, {
@@ -50,11 +50,28 @@ const sockets = io => {
                 username: username,
             })
         })
+        
+        //on disconnect
+        // socket.on("disconnecting", (reason) => {
+        //     console.log(socket.rooms)
+        //     for (const room of socket.rooms) {
+        //       if (room !== socket.id) {
+        //         socket.to(room).emit("user has left", {id: socket.id});
+        //       }
+        //     }
+        //   });
+        socket.on("disconnecting", () => {
+            console.log("User disconnected");
+            const user = deleteUser(socket.id)
+            if (user) {
+                io.in(user.room).emit('notification', { title: 'Someone just left', description: `${user.name} just left the room` })
+                io.in(user.room).emit('users', getUsers(user.room))
+            }
+        })
     })
 }
 
 sockets(io)
-
 
 app.use(cors())
 server.listen(8000, err => {
