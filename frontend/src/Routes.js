@@ -6,6 +6,7 @@ import { UsersProvider } from './Context/usersContext';
 import Home from './Pages/Home/Home'
 import Room from './Pages/Room/Room';
 import WaitingRoom from './Pages/WaitingRoom/WaitingRoom'
+import CanvasTest from './Pages/CanvasTest/CanvasTest'
 
 const Routes = props => {
   return (
@@ -24,6 +25,10 @@ const Routes = props => {
 
             <Route path="/waiting-room">
               <WaitingRoom/>
+            </Route>
+
+            <Route path="/CanvasTest">
+              <CanvasTest/>
             </Route>
 
             <Route path="*">
