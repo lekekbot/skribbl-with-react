@@ -5,9 +5,9 @@ import { SocketProvider } from './Context/socketContext';
 
 //pages
 import Home from './Pages/Home/Home'
-import Room from './Pages/Room/Room';
 import WaitingRoom from './Pages/WaitingRoom/WaitingRoom'
 import CanvasTest from './Pages/CanvasTest/CanvasTest'
+import Game from './Pages/Game/Game';
 
 const Routes = props => {
   return (
@@ -21,16 +21,15 @@ const Routes = props => {
               </Route>
 
               <Route path="/room">
-                <Room/>
-              </Route>
-
-
-              <Route path="/waiting-room">
                 <WaitingRoom/>
               </Route>
 
               <Route path="/CanvasTest">
                 <CanvasTest/>
+              </Route>
+
+              <Route path="/game">
+                <Game/>
               </Route>
 
               <Route path="*">

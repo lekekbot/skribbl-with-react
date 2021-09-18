@@ -1,6 +1,5 @@
 import React, {useState, useRef, useEffect, useContext} from 'react'
 import { Col, Row, Container }from 'react-bootstrap'
-import io from "socket.io-client";
 import { useHistory } from 'react-router-dom'
 
 //styles
@@ -18,7 +17,6 @@ export default function Home() {
     const {name, setName, room, setRoom} = useContext(MainContext)
     const {setUsers} = useContext(UsersContext)
     const socket = useContext(SocketContext)
-
 
     useEffect(() => {
         socket.on("users", users => {
@@ -61,7 +59,9 @@ export default function Home() {
             }
             setRoom(data.code)
             setName(data.username)
-            history.push('/waiting-room')
+            history.push('/room', {
+                host: false
+            })
         })
         //emit socket to join room
     }
@@ -90,7 +90,7 @@ export default function Home() {
             }
             setRoom(data.code)
             setName(data.username)
-            history.push('/waiting-room', {
+            history.push('/room', {
                 host: true
             })
         })
@@ -104,7 +104,6 @@ export default function Home() {
             <Row>
                 <Col>
                     Username: <input type="text" ref={username}/>
-                    
                 </Col>
             </Row>
             <Row>

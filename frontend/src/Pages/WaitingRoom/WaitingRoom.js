@@ -1,6 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react'
 import { Col, Row, Container }from 'react-bootstrap'
-import io from "socket.io-client";
 import { withRouter } from "react-router";
 
 //styles
@@ -15,6 +14,7 @@ import Toast from '../../Shared/swal'
 const WaitingRoom =  withRouter(({ history }) => {
     const {users, setUsers} = useContext(UsersContext)
     const {name, setName, room, setRoom} = useContext(MainContext)
+    console.log(history.location.state)
     const [host] = useState(history.location.state.host)
     const socket = useContext(SocketContext)
 
@@ -26,7 +26,18 @@ const WaitingRoom =  withRouter(({ history }) => {
                 status: "success",
             })
         })
+
+        socket.on('client-game-start', () => {
+            history.push('/game')
+        })
     }, [socket])
+
+    const startGame = () => {
+        history.push('/game')
+        socket.emit('start-game', {
+            room: room
+        })
+    }
 
     //useeffect to get users, on etc. etc.
     return (
@@ -45,7 +56,7 @@ const WaitingRoom =  withRouter(({ history }) => {
             </Row>
             <Row>
                 {host &&
-                    <button>Start Game</button>
+                    <button onClick={() => startGame()}>Start Game</button>
                 }
                 <button>Quit</button>
 

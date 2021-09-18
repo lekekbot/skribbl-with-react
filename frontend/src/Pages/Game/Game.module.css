@@ -1,0 +1,22 @@
+.box {
+    width: 100vw
+}
+
+.top {
+    border: 1px solid black;
+}
+
+.chatMessages {
+    padding: 0;
+    width: 100%;
+}
+
+.message {
+    list-style-type: none;
+    white-space: pre;
+}
+
+.message p {
+    margin: 0;
+    margin-bottom: 5px;
+}

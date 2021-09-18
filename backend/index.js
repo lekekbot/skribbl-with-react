@@ -50,16 +50,15 @@ const sockets = io => {
                 username: username,
             })
         })
+
+        socket.on('start-game', (data) => {
+            io.in(data.room).emit('client-game-start')
+        })
         
-        //on disconnect
-        // socket.on("disconnecting", (reason) => {
-        //     console.log(socket.rooms)
-        //     for (const room of socket.rooms) {
-        //       if (room !== socket.id) {
-        //         socket.to(room).emit("user has left", {id: socket.id});
-        //       }
-        //     }
-        //   });
+        socket.on('send-message', async (data, callback) => {
+            io.in(data.room).emit('client-send-message', {name: data.username, message: data.message})
+        })
+
         socket.on("disconnecting", () => {
             console.log("User disconnected");
             const user = deleteUser(socket.id)
