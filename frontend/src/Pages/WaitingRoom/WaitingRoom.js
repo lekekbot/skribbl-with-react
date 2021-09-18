@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import { Col, Row, Container }from 'react-bootstrap'
 import Swal from 'sweetalert2'
 import io from "socket.io-client";
@@ -18,31 +18,31 @@ export default function WaitingRoom() {
     const history = useHistory()
     const {users, setUsers} = useContext(UsersContext)
     const {name, setName, room, setRoom} = useContext(MainContext)
+    const [html, setHTML] = useState([])
 
     useEffect(() => {
         //get users 
         socket.emit('users', {
             room: room
         })
-
-        socket.on('return-users', (data)=> {
-            if(typeof(data) == 'object') {
-                console.log('nima')
-                setUsers([...data])
-            }
-            setUsers([...data])
-        })
     }, [])
 
+    useEffect(() => {
+        socket.on('return-users', users=> {
+            setUsers(users)
+        })
+    })
 
 
     //useeffect to get users, on etc. etc.
     return (
         <Container>
             <div>yes</div>
-                {users.length > 0 && users.map(e => (
-                    <Row>{e}</Row>
-                ))}
+            {users.length > 0 ?
+                users.map((e,i) => (
+                    <Row key={i}>{e.name}</Row>
+                ))    
+            : ''}
         </Container>
     )
 }

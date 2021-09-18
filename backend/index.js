@@ -15,7 +15,8 @@ const io = require('socket.io')(server, {
 
 const sockets = io => {
     io.on('connection', (socket) => {
-        //store id
+
+        //create room
         socket.on('create-room', async (data, callback) => {
             let randomizedCode = randomatic('aA0', 8);
             let username = data.username
@@ -35,18 +36,24 @@ const sockets = io => {
             })
         })
 
+        //join room
         socket.on('join-room', async (data) => {
             let code = data.room
+            let username = data.username
+
             socket.join(code)
+            const {user, error } = addUser(socket.id, username, code)
+
+            io.to(code).emit('return-users', getUsers(code))
             
-            return socket.to(code).emit('message','yes')
+            return socket.to(code).emit('message', getUsers(code))
         })
 
         //get users 
         socket.on('users', (data)=> {
             let room = data.room
             console.log(getUsers(room))
-            io.emit('return-users', getUsers(room))
+            io.to(code).emit('return-users', getUsers(room))
 
         })
     })
