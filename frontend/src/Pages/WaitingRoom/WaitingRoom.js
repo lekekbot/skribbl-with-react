@@ -19,17 +19,17 @@ export default function WaitingRoom() {
     const {users, setUsers} = useContext(UsersContext)
     const {name, setName, room, setRoom} = useContext(MainContext)
     const [html, setHTML] = useState([])
-
+    
     useEffect(() => {
         //get users 
         socket.emit('users', {
             room: room
         })
-    }, [])
 
-    useEffect(() => {
-        socket.on('return-users', users=> {
-            setUsers(users)
+        socket.on('return-users', users => {
+            console.log(users)
+            console.log('yes')
+            // setUsers(users)
         })
     })
 
@@ -37,7 +37,7 @@ export default function WaitingRoom() {
     //useeffect to get users, on etc. etc.
     return (
         <Container>
-            <div>yes</div>
+            <div>{room}</div>
             {users.length > 0 ?
                 users.map((e,i) => (
                     <Row key={i}>{e.name}</Row>

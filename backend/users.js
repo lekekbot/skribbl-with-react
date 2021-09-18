@@ -24,5 +24,5 @@ const deleteUser = (id) => {
 }
 
 const getUsers = (room) => users.filter(user => user.room === room)
-
-module.exports = { addUser, getUser, deleteUser, getUsers }
+const gay = users
+module.exports = { addUser, getUser, deleteUser, getUsers, gay}

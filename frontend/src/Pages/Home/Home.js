@@ -31,6 +31,13 @@ export default function Home() {
             toast.addEventListener("mouseleave", Swal.resumeTimer);
         },
     });
+
+    useEffect(() => {
+        socket.on("users", users => {
+            setUsers(users)
+        })
+    })
+    
     useEffect(() => {   
         socket.on('message', (data) => {
             console.log(data)

@@ -3,7 +3,7 @@ const cors = require('cors');
 const http = require('http');
 const randomatic = require('randomatic');
 const app = express()
-const { addUser, getUser, deleteUser, getUsers } = require('./users')
+const { addUser, getUser, deleteUser, getUsers, gay } = require('./users')
 
 
 const server = http.createServer(app)
@@ -25,35 +25,36 @@ const sockets = io => {
             if (error) return callback(error,null)
 
             socket.join(randomizedCode)
+            io.in(randomizedCode).emit('users', getUsers(randomizedCode))
 
-            // return socket.emit('room-created', {
-            //     code: randomizedCode,
-            //     username: username,
-            // })
             callback(null, {
                 code: randomizedCode,
                 username: username,
             })
+
         })
 
         //join room
         socket.on('join-room', async (data) => {
-            let code = data.room
+            let room = data.room
             let username = data.username
 
-            socket.join(code)
-            const {user, error } = addUser(socket.id, username, code)
-
-            io.to(code).emit('return-users', getUsers(code))
+            socket.join(room)
+            const {user, error } = addUser(socket.id, username, room)
+            console.log(room)
             
-            return socket.to(code).emit('message', getUsers(code))
+            console.log(getUsers(room))
+            io.in(room).emit('users', getUsers(room))
+            io.in(room).emit('return-users',{help: 'yes'})
         })
 
         //get users 
         socket.on('users', (data)=> {
             let room = data.room
+
             console.log(getUsers(room))
-            io.to(code).emit('return-users', getUsers(room))
+ 
+            io.in(room).emit('return-users',{help: 'yes'})
 
         })
     })
