@@ -14,10 +14,10 @@ import Toast from '../../Shared/swal'
 export default function Game() {
     const history = useHistory()
     const {name, setName, room, setRoom} = useContext(MainContext)
-    const {setUsers} = useContext(UsersContext)
+    const {users, setUsers} = useContext(UsersContext)
     const socket = useContext(SocketContext)
     const [messages, setMessages] = useState([])
-
+    console.log(users)
     const [timer, setTimer] = useState()
     const [word, setWord] = useState()
 
@@ -49,14 +49,23 @@ export default function Game() {
         </li>
     ))
 
+    const getScore = users.map((e,i)=> (
+        <li key={i} className={styles.score}>
+            <div className={styles.scoreRow}><b>{e.name}</b>
+            {e.isDrawing ? <>NYESS</> : ''}
+            <span className={styles.scoreScore}>{e.score}</span></div>
+        </li>
+    ))
+
     return (
         <Container className={styles.box}>
             <Row>
                 <Col xs={2}>
                     <h1>Score</h1>
-                    <div>
+                    <ul className={styles.chatMessages}>
                         {/* scorboard, map it */}
-                    </div>
+                        {getScore}
+                    </ul>
                 </Col>
                 <Col xs={8}>
                     {/* word thing */}

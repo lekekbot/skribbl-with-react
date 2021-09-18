@@ -21,7 +21,7 @@ const sockets = io => {
             let randomizedCode = randomatic('A0', 8);
             let username = data.username
 
-            const { user, error } = addUser(socket.id, username, randomizedCode, true)
+            const { user, error } = addUser(socket.id, username, randomizedCode, true, 0, false)
             if (error) return callback(error,null)
 
             await socket.join(randomizedCode)
@@ -31,7 +31,6 @@ const sockets = io => {
                 code: randomizedCode,
                 username: username,
             })
-
         })
 
         //join room
@@ -39,7 +38,7 @@ const sockets = io => {
             let room = data.room
             let username = data.username
 
-            const { user, error } = addUser(socket.id, username, room)
+            const { user, error } = addUser(socket.id, username, room, false,  0, false)
             if (error) return callback(error,null)
             
             await socket.join(room)
@@ -56,6 +55,9 @@ const sockets = io => {
         })
         
         socket.on('send-message', async (data, callback) => {
+            //check for correct answer
+
+            //if not correct answer just send out message
             io.in(data.room).emit('client-send-message', {name: data.username, message: data.message})
         })
 

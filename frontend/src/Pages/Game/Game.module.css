@@ -9,6 +9,8 @@
 .chatMessages {
     padding: 0;
     width: 100%;
+    list-style-type: none;
+
 }
 
 .message {
@@ -19,4 +21,17 @@
 .message p {
     margin: 0;
     margin-bottom: 5px;
+}
+
+/* score */
+.scoreRow {
+    display: flex;
+    justify-content: space-between;
+}
+.score {
+    list-style-type: none;
+}
+
+.scoreScore {
+    text-align: right;
 }
