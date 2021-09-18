@@ -1,0 +1,14 @@
+.box {
+    margin: 0 auto;
+    margin-top: 15px;
+    width: 70%;
+}
+
+.usersTable {
+    border: 1px solid black;
+}
+
+.usersTable h1 {
+    padding-bottom: 15px;
+    margin: 0;
+}

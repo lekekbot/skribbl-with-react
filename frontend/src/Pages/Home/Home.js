@@ -1,6 +1,5 @@
 import React, {useState, useRef, useEffect, useContext} from 'react'
 import { Col, Row, Container }from 'react-bootstrap'
-import Swal from 'sweetalert2'
 import io from "socket.io-client";
 import { useHistory } from 'react-router-dom'
 
@@ -10,27 +9,16 @@ import styles from './Home.module.css'
 //components
 import { MainContext } from '../../Context/mainContext';
 import { UsersContext } from '../../Context/usersContext';
+import { SocketContext } from '../../Context/socketContext';
+import Toast from '../../Shared/swal'
 
 //backend
-const socket = io('http://localhost:8000');
-
 export default function Home() {
     const history = useHistory()
     const {name, setName, room, setRoom} = useContext(MainContext)
     const {setUsers} = useContext(UsersContext)
+    const socket = useContext(SocketContext)
 
-    const Toast = Swal.mixin({
-        toast: true,
-        position: "top-right",
-        showConfirmButton: false,
-        showCloseButton: true,
-        timer: 2000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-            toast.addEventListener("mouseenter", Swal.stopTimer);
-            toast.addEventListener("mouseleave", Swal.resumeTimer);
-        },
-    });
 
     useEffect(() => {
         socket.on("users", users => {
@@ -102,7 +90,9 @@ export default function Home() {
             }
             setRoom(data.code)
             setName(data.username)
-            history.push('/waiting-room')
+            history.push('/waiting-room', {
+                host: true
+            })
         })
     }
 

@@ -1,6 +1,6 @@
 const users = []
 
-const addUser = (id, name, room) => {
+const addUser = (id, name, room, host) => {
     const existingUser = users.find(user => user.name.trim().toLowerCase() === name.trim().toLowerCase())
 
     if (existingUser) return { error: "Username has already been taken" }
@@ -8,7 +8,7 @@ const addUser = (id, name, room) => {
     if (!name) return { error: "Username is required" }
     if (!room) return { error: "Room is required" }
 
-    const user = { id, name, room }
+    const user = { id, name, room, host }
     users.push(user)
     return { user }
 }
@@ -24,5 +24,5 @@ const deleteUser = (id) => {
 }
 
 const getUsers = (room) => users.filter(user => user.room === room)
-const gay = users
-module.exports = { addUser, getUser, deleteUser, getUsers, gay}
+
+module.exports = { addUser, getUser, deleteUser, getUsers}
