@@ -1,5 +1,5 @@
-import React, {useState, useRef, useEffect, useContext} from 'react'
-import { Col, Row, Container }from 'react-bootstrap'
+import React, { useState, useRef, useEffect, useContext } from 'react'
+import { Col, Row, Container } from 'react-bootstrap'
 import { useHistory } from 'react-router-dom'
 
 //styles
@@ -14,8 +14,8 @@ import Toast from '../../Shared/swal'
 //backend
 export default function Home() {
     const history = useHistory()
-    const {name, setName, room, setRoom} = useContext(MainContext)
-    const {setUsers} = useContext(UsersContext)
+    const { name, setName, room, setRoom } = useContext(MainContext)
+    const { setUsers } = useContext(UsersContext)
     const socket = useContext(SocketContext)
 
     useEffect(() => {
@@ -31,14 +31,14 @@ export default function Home() {
         let name = username.current.value
         let room = roomCode.current.value
 
-        if(!(name.length > 0)) { 
+        if (!(name.length > 0)) {
             Toast.fire({
                 icon: 'error',
                 title: 'Your username is empty'
             })
             return username.current.focus()
-        } 
-        if(!(room.length > 0)) {
+        }
+        if (!(room.length > 0)) {
             Toast.fire({
                 icon: 'error',
                 title: 'Your Room Code is empty'
@@ -50,7 +50,7 @@ export default function Home() {
             username: name,
             room: room,
         }, (err, data) => {
-            if(err) {
+            if (err) {
                 console.log(err)
                 return Toast.fire({
                     icon: 'error',
@@ -68,7 +68,7 @@ export default function Home() {
 
     const createRoom = () => {
         let name = username.current.value
-        if(!(name.length > 0)) { 
+        if (!(name.length > 0)) {
             Toast.fire({
                 icon: 'error',
                 title: 'Your username is empty'
@@ -81,7 +81,7 @@ export default function Home() {
         socket.emit('create-room', {
             username: name,
         }, (err, data) => {
-            if(err) {
+            if (err) {
                 console.log(err)
                 return Toast.fire({
                     icon: 'error',
@@ -97,26 +97,46 @@ export default function Home() {
     }
 
     return (
-        <Container className={styles.box}>
-            <Row>
-                <h1>Skribbl Ni Ma</h1>
-            </Row>
-            <Row>
-                <Col>
-                    Username: <input type="text" ref={username}/>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                <input type="text" ref={roomCode}/>
-                <button onClick={e => joinRoom()}>
-                    Join Room
-                    </button>
-                </Col>
-                <Col>
-                <button onClick={e => createRoom()}>Create Room</button>
-                </Col>
-            </Row>
-        </Container>
+        <div className={styles.box}>
+            <Container className={styles.formBox}>
+                <Row>
+                    <h1 style={{ color: 'white', fontWeight: 800}}>Skribbl Ni Ma</h1>
+                </Row>
+                <Row>
+                    <Col>
+                        <div className={styles.textHeader}>USERNAME:</div>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <input type="text" ref={username} className={styles.textField} placeholder="Enter Your Name"/>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <div className={styles.textHeader}>ROOM CODE:</div>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <input type="text" ref={roomCode} className={styles.textField} placeholder="Enter The Room Code"/>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <button onClick={e => joinRoom()} style={{ background: "dodgerblue" }} className={styles.button}>
+                            Join Room
+                        </button>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <button onClick={e => createRoom()} style={{ background: "limegreen" }} className={styles.button}>
+                            Create Room
+                        </button>
+                    </Col>
+                </Row>
+            </Container>
+        </div>
     )
 }
