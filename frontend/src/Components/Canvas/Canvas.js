@@ -26,14 +26,9 @@ export default function Canvas(props) {
     }
 
     function handleCanvasClear() {
-
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
-
-        ctx.beginPath();
-        ctx.rect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "white";
-        ctx.fill();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
     //canvas settings
@@ -59,8 +54,8 @@ export default function Canvas(props) {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
 
-        canvas.width = canvasRef.current.parentNode.parentNode.clientWidth || 1000
-        canvas.height = canvasRef.current.parentNode.parentNode.parentNode.parentNode.clientHeight - 200 || 500
+        canvas.width = canvasRef.clientWidth || 1000
+        canvas.height = canvasRef.clientHeight - 200 || 500
 
         //canvas functions
         let drawing = false;
