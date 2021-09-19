@@ -36,8 +36,8 @@ export default function Canvas(props) {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
 
-        canvas.width = canvasRef.current.parentNode.parentNode.clientWidth && 1000
-        canvas.height = canvasRef.current.parentNode.parentNode.parentNode.parentNode.clientHeight - 200 && 500
+        canvas.width = canvasRef.current.parentNode.parentNode.clientWidth || 1000
+        canvas.height = canvasRef.current.parentNode.parentNode.parentNode.parentNode.clientHeight - 200 || 500
 
         //canvas functions
         let drawing = false;
