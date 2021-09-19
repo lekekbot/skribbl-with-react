@@ -14,7 +14,7 @@ import Toast from '../../Shared/swal'
 const WaitingRoom =  withRouter(({ history }) => {
     const {users, setUsers} = useContext(UsersContext)
     const {name, setName, room, setRoom} = useContext(MainContext)
-    console.log(history.location.state)
+
     const [host] = useState(history.location.state.host)
     const socket = useContext(SocketContext)
 
@@ -29,6 +29,10 @@ const WaitingRoom =  withRouter(({ history }) => {
 
         socket.on('client-game-start', () => {
             history.push('/game')
+        })
+
+        socket.on('remove-room', () => {
+            history.push('/')
         })
     }, [socket])
 

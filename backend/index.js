@@ -3,7 +3,7 @@ const cors = require('cors');
 const http = require('http');
 const randomatic = require('randomatic');
 const app = express()
-const { addUser, getUser, deleteUser, getUsers } = require('./users')
+const { addUser, getUser, deleteUser, getUsers, deleteRoom } = require('./users')
 
 
 const server = http.createServer(app)
@@ -50,10 +50,12 @@ const sockets = io => {
             })
         })
 
+        //start game 
         socket.on('start-game', (data) => {
             io.in(data.room).emit('client-game-start')
         })
         
+        //chat message
         socket.on('send-message', async (data, callback) => {
             //check for correct answer
 
@@ -61,12 +63,29 @@ const sockets = io => {
             io.in(data.room).emit('client-send-message', {name: data.username, message: data.message})
         })
 
+        //drawing socket
+        socket.on('send-drawing', async (data) => {
+            socket.to(data.room).emit('drawing', {x:data.x, y: data.y})
+        })
+
+        socket.on('mouse-up', async (data) => {
+            socket.to(data.room).emit('mouseUp')
+        })
+
+        //when user refresh, close browser 
         socket.on("disconnecting", () => {
-            console.log("User disconnected");
             const user = deleteUser(socket.id)
             if (user) {
-                io.in(user.room).emit('notification', { title: 'Someone just left', description: `${user.name} just left the room` })
-                io.in(user.room).emit('users', getUsers(user.room))
+                //if host, delete room completely
+                if(user.host) {                
+                    deleteRoom(user.room)
+                    io.in(user.room).emit('remove-room')
+                    io.in(user.room).emit('notification', { title: 'Host has left', description: `Start a new game.` })
+                } else {
+                //delete user only 
+                    io.in(user.room).emit('notification', { title: 'Someone just left', description: `${user.name} just left the room` })
+                    io.in(user.room).emit('users', getUsers(user.room))
+                }
             }
         })
     })
@@ -75,6 +94,7 @@ const sockets = io => {
 sockets(io)
 
 app.use(cors())
+
 server.listen(8000, err => {
     if (err) return console.log(`Cannot Listen on PORT: 8000`);
     console.log(`Server is Listening on: http://localhost:8000/`);

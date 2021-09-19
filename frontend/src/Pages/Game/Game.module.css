@@ -1,37 +1,41 @@
 .box {
-    width: 100vw
+  width: 100vw;
+  height: 100%;
 }
 
 .top {
-    border: 1px solid black;
+  border: 1px solid black;
 }
 
 .chatMessages {
-    padding: 0;
-    width: 100%;
-    list-style-type: none;
-
+  padding: 0;
+  width: 100%;
+  list-style-type: none;
 }
 
 .message {
-    list-style-type: none;
-    white-space: pre;
+  list-style-type: none;
+  white-space: pre;
 }
 
 .message p {
-    margin: 0;
-    margin-bottom: 5px;
+  margin: 0;
+  margin-bottom: 5px;
 }
 
 /* score */
 .scoreRow {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 .score {
-    list-style-type: none;
+  list-style-type: none;
 }
 
 .scoreScore {
-    text-align: right;
+  text-align: right;
+}
+
+.canvas {
+    flex: 1 1 auto;
 }

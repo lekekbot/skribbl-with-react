@@ -10,6 +10,8 @@ import { MainContext } from '../../Context/mainContext';
 import { UsersContext } from '../../Context/usersContext';
 import { SocketContext } from '../../Context/socketContext';
 import Toast from '../../Shared/swal'
+import CanvasTest from '../CanvasTest/CanvasTest';
+
 
 export default function Game() {
     const history = useHistory()
@@ -17,7 +19,7 @@ export default function Game() {
     const {users, setUsers} = useContext(UsersContext)
     const socket = useContext(SocketContext)
     const [messages, setMessages] = useState([])
-    console.log(users)
+
     const [timer, setTimer] = useState()
     const [word, setWord] = useState()
 
@@ -59,7 +61,7 @@ export default function Game() {
 
     return (
         <Container className={styles.box}>
-            <Row>
+            <Row style={{height: '100%'}}>
                 <Col xs={2}>
                     <h1>Score</h1>
                     <ul className={styles.chatMessages}>
@@ -67,7 +69,7 @@ export default function Game() {
                         {getScore}
                     </ul>
                 </Col>
-                <Col xs={8}>
+                <Col xs={8} style={{display: 'flex', height: '100%', flexDirection:'column'}}>
                     {/* word thing */}
                     <div className={styles.top}>
                         {/* timer */}
@@ -78,6 +80,9 @@ export default function Game() {
                     </div>
                     {/* /canvas */}
                     NYESS
+                    <div className={styles.canvas}>
+                        <CanvasTest />
+                    </div>
                 </Col>
                 <Col xs={2}>
                     {/* chat box */}
