@@ -1,5 +1,5 @@
-import React, {useContext, useEffect, useState} from 'react'
-import { Col, Row, Container }from 'react-bootstrap'
+import React, { useContext, useEffect, useState } from 'react'
+import { Button, Col, Row, Container, ListGroup} from 'react-bootstrap'
 import { withRouter } from "react-router";
 
 //styles
@@ -11,9 +11,9 @@ import { UsersContext } from '../../Context/usersContext';
 import { SocketContext } from '../../Context/socketContext';
 import Toast from '../../Shared/swal'
 
-const WaitingRoom =  withRouter(({ history }) => {
-    const {users, setUsers} = useContext(UsersContext)
-    const {name, setName, room, setRoom} = useContext(MainContext)
+const WaitingRoom = withRouter(({ history }) => {
+    const { users, setUsers } = useContext(UsersContext)
+    const { name, setName, room, setRoom } = useContext(MainContext)
 
     const [host] = useState(history.location.state.host)
     const socket = useContext(SocketContext)
@@ -45,28 +45,32 @@ const WaitingRoom =  withRouter(({ history }) => {
 
     //useeffect to get users, on etc. etc.
     return (
-        <Container className={styles.box}>
-            <div>Room Code: {room}</div>
-            <br/>
-            <Row className={styles.usersTable}>
-                <h1>Users Joined:</h1>
-                <ul>
-                    {users.length > 0 ?
-                        users.map((e,i) => (
-                            <li key={i}>{e.name}</li>
-                        ))    
-                    : ''}
-                </ul>
-            </Row>
-            <Row>
-                {host &&
-                    <button onClick={() => startGame()}>Start Game</button>
-                }
-                <button>Quit</button>
-
-
-            </Row>
-        </Container>
+        <div className={styles.box}>
+            <Container>
+                <div>Room Code: {room}</div>
+                <br />
+                <Row>
+                    <h1 className={styles.usersHeader}>Users Joined:</h1>
+                </Row>
+                <Row>
+                    <Col md={6}>
+                        <Row className={styles.usersList}>
+                            {users.length > 0 ?
+                                users.map((e, i) => (
+                                    <Col md={3} className={styles.usersName} key={i}>{e.name}</Col>
+                                ))
+                                : ''}
+                        </Row>
+                    </Col>
+                    <Col md={6} style={{ textAlign: "center" }}>
+                    {host &&
+                        <Button className={styles.button} onClick={() => startGame()}>Start Game</Button>
+                    }
+                    <Button className={styles.button} style={{ background: "red" }}>Quit</Button>
+                </Col>
+                </Row>
+            </Container>
+        </div>
     )
 })
 
