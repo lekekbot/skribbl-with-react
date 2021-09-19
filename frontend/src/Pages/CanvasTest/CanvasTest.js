@@ -12,7 +12,7 @@ export default function CanvasTest() {
 
             </Row>
             <Row>
-                <Canvas />
+                <Canvas/>
             </Row>
         </Container>
 
