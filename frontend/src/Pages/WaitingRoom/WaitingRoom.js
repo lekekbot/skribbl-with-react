@@ -66,7 +66,7 @@ const WaitingRoom = withRouter(({ history }) => {
                 <Row className={styles.centering}>
                     <Col>
                         {host &&
-                            <Button className={styles.button} onClick={() => startGame()}>Start Game</Button>
+                            <Button className={styles.button} style={{ background: "dodgerblue" }} onClick={() => startGame()}>Start Game</Button>
                         }
                         <Button className={styles.button} style={{ background: "red" }}>Quit</Button>
                     </Col>

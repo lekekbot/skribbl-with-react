@@ -59,6 +59,15 @@
     }
 }
 
+@keyframes newPlayer {
+    0% {
+        transform: scale(1.1, 1.1);
+    }
+    100% {
+        transform: scale(1, 1);
+    }
+}
+
 .roomCode {
     background-color: rgb(127, 0, 255);
     text-align: center;
@@ -85,9 +94,11 @@
 }
 
 .usersName {
+    animation: newPlayer 0.5s ease alternate;
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
-    height: auto;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
     background-color: rgb(127, 0, 255);
     color: white;
     text-align: center;
@@ -96,6 +107,8 @@
     border-radius: 10px;
     font-size: x-large;
     font-weight: 800;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
 }
 
 .button {
