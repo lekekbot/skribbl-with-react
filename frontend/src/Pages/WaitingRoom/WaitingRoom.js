@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Button, Col, Row, Container, ListGroup} from 'react-bootstrap'
+import { Button, Col, Row, Container, ListGroup } from 'react-bootstrap'
 import { withRouter } from "react-router";
 
 //styles
@@ -46,15 +46,14 @@ const WaitingRoom = withRouter(({ history }) => {
     //useeffect to get users, on etc. etc.
     return (
         <div className={styles.box}>
-            <Container>
-                <div>Room Code: {room}</div>
-                <br />
+                <h1 className={styles.roomCode}>Room Code: {room}</h1>
+            <Container className={styles.roomBox}>
                 <Row>
-                    <h1 className={styles.usersHeader}>Users Joined:</h1>
+                    <h1 className={styles.usersHeader}>Users Joined: {users.length}</h1>
                 </Row>
-                <Row>
-                    <Col md={6}>
-                        <Row className={styles.usersList}>
+                <Row className={styles.usersList}>
+                    <Col>
+                        <Row className={styles.centering}>
                             {users.length > 0 ?
                                 users.map((e, i) => (
                                     <Col md={3} className={styles.usersName} key={i}>{e.name}</Col>
@@ -62,12 +61,15 @@ const WaitingRoom = withRouter(({ history }) => {
                                 : ''}
                         </Row>
                     </Col>
-                    <Col md={6} style={{ textAlign: "center" }}>
-                    {host &&
-                        <Button className={styles.button} onClick={() => startGame()}>Start Game</Button>
-                    }
-                    <Button className={styles.button} style={{ background: "red" }}>Quit</Button>
-                </Col>
+                </Row>
+                <br/>
+                <Row className={styles.centering}>
+                    <Col>
+                        {host &&
+                            <Button className={styles.button} onClick={() => startGame()}>Start Game</Button>
+                        }
+                        <Button className={styles.button} style={{ background: "red" }}>Quit</Button>
+                    </Col>
                 </Row>
             </Container>
         </div>
