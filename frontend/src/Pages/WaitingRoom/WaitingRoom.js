@@ -28,7 +28,9 @@ const WaitingRoom = withRouter(({ history }) => {
         })
 
         socket.on('client-game-start', () => {
-            history.push('/game')
+            history.push('/game', {
+                host: host
+            })
         })
 
         socket.on('remove-room', () => {
@@ -37,7 +39,6 @@ const WaitingRoom = withRouter(({ history }) => {
     }, [socket])
 
     const startGame = () => {
-        history.push('/game')
         socket.emit('start-game', {
             room: room
         })

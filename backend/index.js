@@ -3,8 +3,8 @@ const cors = require('cors');
 const http = require('http');
 const randomatic = require('randomatic');
 const app = express()
-const { addUser, getUser, deleteUser, getUsers, deleteRoom } = require('./users')
-
+const { addUser, getUser, deleteUser, getUsers, deleteRoom, editUser, getRandomUser } = require('./users');
+const { getWords, rmvRoom } = require('./words');
 
 const server = http.createServer(app)
 const io = require('socket.io')(server, {
@@ -12,6 +12,7 @@ const io = require('socket.io')(server, {
         origin: '*'
     }
 })
+
 
 const sockets = io => {
     io.on('connection', (socket) => {
@@ -21,7 +22,7 @@ const sockets = io => {
             let randomizedCode = randomatic('A0', 8);
             let username = data.username
 
-            const { user, error } = addUser(socket.id, username, randomizedCode, true, 0, false)
+            const { user, error } = addUser(socket.id, username, randomizedCode, true, 0, 0)
             if (error) return callback(error,null)
 
             await socket.join(randomizedCode)
@@ -38,7 +39,7 @@ const sockets = io => {
             let room = data.room
             let username = data.username
 
-            const { user, error } = addUser(socket.id, username, room, false,  0, false)
+            const { user, error } = addUser(socket.id, username, room, false,  0, 0)
             if (error) return callback(error,null)
             
             await socket.join(room)
@@ -51,8 +52,20 @@ const sockets = io => {
         })
 
         //start game 
-        socket.on('start-game', (data) => {
+        socket.on('start-game', async (data) => {
             io.in(data.room).emit('client-game-start')
+        })
+
+        socket.on('game-setup', async (data) => {
+            let selectedUser = getRandomUser(data.room)
+            let words = getWords(data.room)
+            await io.in(data.room).emit('users', getUsers(data.room))
+
+            io.in(data.room).emit('client-game-setup',{
+                drawer: selectedUser.id,
+                words: words
+            })
+
         })
         
         //chat message
@@ -65,11 +78,16 @@ const sockets = io => {
 
         //drawing socket
         socket.on('send-drawing', async (data) => {
-            socket.to(data.room).emit('drawing', {x:data.x, y: data.y})
+            socket.to(data.room).emit('drawing', {x:data.x, y: data.y, size: data.size, color: data.color})
         })
 
         socket.on('mouse-up', async (data) => {
             socket.to(data.room).emit('mouseUp')
+        })
+
+        //canvas clear
+        socket.on('clear-drawing', async (data) => {
+            socket.to(data.room).emit('clear')
         })
 
         //when user refresh, close browser 
@@ -79,6 +97,7 @@ const sockets = io => {
                 //if host, delete room completely
                 if(user.host) {                
                     deleteRoom(user.room)
+                    rmvRoom(user.room)
                     io.in(user.room).emit('remove-room')
                     io.in(user.room).emit('notification', { title: 'Host has left', description: `Start a new game.` })
                 } else {

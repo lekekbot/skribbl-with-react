@@ -1,6 +1,6 @@
 import React, {useState, useContext, useRef, useEffect} from 'react'
 import { Col, Row, Container } from 'react-bootstrap'
-import { useHistory } from 'react-router-dom'
+import { useHistory, withRouter } from 'react-router';
 
 //style
 import styles from './Game.module.css'
@@ -10,11 +10,10 @@ import { MainContext } from '../../Context/mainContext';
 import { UsersContext } from '../../Context/usersContext';
 import { SocketContext } from '../../Context/socketContext';
 import Toast from '../../Shared/swal'
-import CanvasTest from '../CanvasTest/CanvasTest';
+import Canvas from '../../Components/Canvas/Canvas';
 
-
-export default function Game() {
-    const history = useHistory()
+const Game = withRouter(({history}) => {
+    const [host] = useState(history.location.state.host)
     const {name, setName, room, setRoom} = useContext(MainContext)
     const {users, setUsers} = useContext(UsersContext)
     const socket = useContext(SocketContext)
@@ -22,13 +21,36 @@ export default function Game() {
 
     const [timer, setTimer] = useState()
     const [word, setWord] = useState()
+    const [disableEdit, setDisableEdit] = useState(false)
 
     const msg = useRef(null)
 
+    
     useEffect(() => {
         socket.on('client-send-message', (data) => {
             setMessages(prevState => [...prevState, {name: data.name, message: data.message}])
         })   
+
+        socket.on('client-game-setup', (data) => {
+            console.log(data)
+            if(socket.id == data.drawer) {
+                setDisableEdit(false)
+            } else {
+                setDisableEdit(true)
+            }
+        })
+
+            
+        if(room) {
+            if(host) {
+                socket.emit('game-setup', {
+                    room: room
+                })
+            }
+        } else {
+            // dev will comment off
+            history.push('/')
+        }
     }, [socket])
 
     const sendMessage =  e => {
@@ -46,9 +68,7 @@ export default function Game() {
     }
 
     const chatMessages = messages.map((e,i) => (
-        <li key={i} className={styles.message}>
-            <p><b>{e.name}</b>: {e.message}</p>
-        </li>
+        <p className={styles.message} key={i}><b>{e.name}</b>: {e.message}</p>
     ))
 
     const getScore = users.map((e,i)=> (
@@ -61,15 +81,15 @@ export default function Game() {
 
     return (
         <Container className={styles.box}>
-            <Row style={{height: '100%'}}>
-                <Col xs={2}>
+            <Row style={{maxHeight: '100vh'}}>
+                <Col xs={2} style={{maxHeight: '100%'}}>
                     <h1>Score</h1>
                     <ul className={styles.chatMessages}>
                         {/* scorboard, map it */}
                         {getScore}
                     </ul>
                 </Col>
-                <Col xs={8} style={{display: 'flex', height: '100%', flexDirection:'column'}}>
+                <Col xs={8} style={{display: 'flex', maxHeight: '100%', flexDirection:'column'}}>
                     {/* word thing */}
                     <div className={styles.top}>
                         {/* timer */}
@@ -81,20 +101,21 @@ export default function Game() {
                     {/* /canvas */}
                     NYESS
                     <div className={styles.canvas}>
-                        <CanvasTest />
+                        <Canvas />
                     </div>
                 </Col>
-                <Col xs={2}>
+                <Col xs={2} className={styles.chat} style={{maxHeight: '100%'}}>
                     {/* chat box */}
                     <h1>Chat</h1>
-                    <div>
-                        {/* messages */}
-                        <ul className={styles.chatMessages}>{chatMessages}</ul>
+                    
+                    {/* messages */}
+                    <div className={styles.chatMessages}>{chatMessages}</div>
                         
-                        <input type="text" ref={msg} onKeyDown={e => sendMessage(e)}/>
-                    </div>
+                    <input type="text" ref={msg} onKeyDown={e => sendMessage(e)}/>
                 </Col>
             </Row>
         </Container>
     )
-}
+})
+
+export default Game
