@@ -1,4 +1,4 @@
-const users = []
+let users = []
 
 const addUser = (id, name, room, host, score, isDrawing) => {
     const existingUser = users.find(user => user.name.trim().toLowerCase() === name.trim().toLowerCase() && user.room === room)
@@ -8,7 +8,7 @@ const addUser = (id, name, room, host, score, isDrawing) => {
     if (!name) return { error: "Username is required" }
     if (!room) return { error: "Room is required" }
 
-    const user = { id, name, room, host, score, isDrawing }
+    const user = { id, name, room, host, score, isDrawing, correct: false, hasDrawn: 0 }
     users.push(user)
     return { user }
 }
@@ -18,14 +18,53 @@ const getUser = id => {
     return user
 }
 
+const getDrawnUsers = room => {
+    let list = users.filter(e => e.room == room)
+
+    for(i =0; i < list.length; i++) {
+        if(i == 0) {
+            drawn = list[i].hasDrawn
+        }
+        if(list[i].hasDrawn != drawn) {
+            return false
+        }
+    }
+    return true
+}
+
+const getAllCorrect = room => {
+    let list = users.filter(e => e.room == room)
+    let allcorrect = true
+    
+    for(i of list) {
+        if(!i.correct && !i.isDrawing) {
+            allcorrect = false
+            break
+        }
+    }
+    return allcorrect
+}
+
 const editUser = (id, data) => {
     users.forEach((e, i) => {
         if(e.id == id) {
-            e[i] = {...e, ...data};
+            e = {...e, ...data};
         }
     });
-    return
+    console.log(users);
+    return 
 }
+
+const resetUsers = async (room) => {
+     users.forEach((e,i) => {
+        if(e.room == room) {
+            users[i].correct = false
+            users[i].isDrawing = false
+        }
+    });
+    return 
+}
+
 
 const deleteUser = (id) => {
     const index = users.findIndex((user) => user.id === id);
@@ -42,16 +81,12 @@ const getUsers = (room) => users.filter(user => user.room === room)
 const getRandomUser = (room) => {
     let user
     for(e of getUsers(room)) {
-        if(e.isDrawing == 0) {
+        if(e.hasDrawn == 0) {
             user = e
             break
-        } else if(e.isDrawing == 1) {
-            continue
         }
     }
-    if(user) {
-        return user
-    } else return false
+    if(user) return user
 }
 
-module.exports = { addUser, getUser, deleteUser, getUsers, deleteRoom, editUser, getRandomUser}
+module.exports = { addUser, getUser, deleteUser, getUsers, deleteRoom, editUser, getRandomUser, getAllCorrect, getDrawnUsers, resetUsers}

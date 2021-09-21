@@ -87,12 +87,6 @@ export default function Canvas(props) {
         canvas.width = canvasRef.current.parentNode.parentNode.clientWidth || 1000
         canvas.height = canvasRef.current.parentNode.parentNode.parentNode.parentNode.clientHeight - 165 || 500
 
-        //my cool event listeners
-        // canvas.addEventListener("mousedown", startPosition);
-        // canvas.addEventListener("mouseup", endPosition);
-        // canvas.addEventListener("mousemove", e => {
-        //     draw(e.offsetX, e.offsetY)
-        // }); 
         contextRef.current = ctx
     }, [])
 

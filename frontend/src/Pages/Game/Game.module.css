@@ -5,7 +5,27 @@
 
 .top {
   border: 1px solid black;
+  font-size: 20px;
+  padding: 5px;
 }
+
+.timer {
+  display: inline-block;
+  width: calc(33% - 20px);
+  margin-left: 20px;
+
+}
+
+.word {
+  display: inline-block;
+  width: 33%;
+  letter-spacing: 8px;
+  text-align: center;
+  font-weight: bold;
+  font-family: cursive;
+}
+
+
 
 /* chat */
 .chat {
@@ -52,3 +72,35 @@
 .canvas {
     flex: 1 1 auto;
 }
+
+
+.wordContainer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  top: 0;
+  left: 0;
+}
+
+.wordRow {
+  transform: translate(-50%, -50%);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: row;
+}
+
+.wordCol {
+  background-color: white;
+  margin: 0 10px;
+  padding: 5px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.wordCol:hover {
+  background-color: wheat;
+}
+

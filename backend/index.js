@@ -3,8 +3,9 @@ const cors = require('cors');
 const http = require('http');
 const randomatic = require('randomatic');
 const app = express()
-const { addUser, getUser, deleteUser, getUsers, deleteRoom, editUser, getRandomUser } = require('./users');
-const { getWords, rmvRoom } = require('./words');
+const { addUser, getUser, deleteUser, getUsers, deleteRoom, editUser, getRandomUser, getAllCorrect, getDrawnUsers, resetUsers  } = require('./users');
+const { getWords, rmvRoom, selectedWord, getSelectedWord } = require('./words');
+const words = require('random-words');
 
 const server = http.createServer(app)
 const io = require('socket.io')(server, {
@@ -13,7 +14,8 @@ const io = require('socket.io')(server, {
     }
 })
 
-
+//io = all users
+//socket = user who emitted/ will be emitted
 const sockets = io => {
     io.on('connection', (socket) => {
 
@@ -57,23 +59,114 @@ const sockets = io => {
         })
 
         socket.on('game-setup', async (data) => {
-            let selectedUser = getRandomUser(data.room)
-            let words = getWords(data.room)
-            await io.in(data.room).emit('users', getUsers(data.room))
+            let { room } = data
+            let selectedUser = getRandomUser(room)
+            let words = getWords(room)
+            await io.in(room).emit('users', getUsers(room))
 
-            io.in(data.room).emit('client-game-setup',{
+            selectedUser.isDrawing = true
+            selectedUser.hasDrawn = selectedUser.hasDrawn +1
+
+            editUser(selectedUser.id, selectedUser)
+
+            io.in(room).emit('client-game-setup',{
                 drawer: selectedUser.id,
                 words: words
             })
+        })
 
+        socket.on('start-round', async (data) => {
+            let { room, word } = data
+            let time = 99
+            selectedWord(room, word)
+
+            //make words to _ _ _ _
+            let noWords = ''
+            for(i = 0; i < word.length; i++) {
+                noWords += '_'
+            }
+
+            let timer = setInterval( async () => {
+                await io.in(room).emit('users', getUsers(room))
+
+                // if all users get correct
+                let allCorrect = getAllCorrect(room)
+                if(allCorrect) {
+                    clearInterval(timer)
+                    return io.in(room).emit('round-over', {
+                        word: word
+                    })
+                }
+
+                //game over if timer hits 0
+                if(time == 0) {
+                    clearInterval(timer)
+                    return io.in(room).emit('round-over', {
+                        word: word
+                    })
+
+                }  else if(time == Math.floor(99/2)) {
+                    //give hint
+                    noWords = ''
+                    let randomLetter = Math.floor(Math.random() * word.length)
+                    for(i = 0; i < word.length; i++) {
+                        if(i == randomLetter) {
+                            noWords += word[i]
+                        } else {
+                            noWords += '_'
+                        }
+                    }
+                }
+                io.in(data.room).emit('time', {
+                    time: time,
+                    word: noWords
+                })
+                time--
+            }, 1000);
+        })
+
+        socket.on('next-round', async (data) => {
+            let { room } = data
+            //get x ppl if is drawing
+            let drawnUsers = getDrawnUsers(room)
+            await resetUsers(room)
+            socket.to(room).emit('clear')
+            socket.to(room).emit('clear-chat')
+
+            if(drawnUsers) {
+                return io.in(room).emit('end-game')
+            } else {
+                let selectedUser = getRandomUser(room)
+                let words = getWords(room)
+                await io.in(room).emit('users', getUsers(room))     
+                
+                selectedUser.isDrawing = true
+                selectedUser.hasDrawn = selectedUser.hasDrawn +1
+                editUser(selectedUser.id, selectedUser)
+
+                io.in(data.room).emit('client-game-setup',{
+                    drawer: selectedUser.id,
+                    words: words
+                })
+            }
         })
         
         //chat message
-        socket.on('send-message', async (data, callback) => {
+        socket.on('send-message', async (data) => {
             //check for correct answer
+            if(data.message.toUpperCase() == getSelectedWord(data.room)) {
+                //answers correctly
+                let user = getUser(socket.id)      
+                console.log(user)
+                user.correct = true
+                editUser(socket.id, user)
 
-            //if not correct answer just send out message
-            io.in(data.room).emit('client-send-message', {name: data.username, message: data.message})
+                io.in(data.room).emit('client-correct', {message: `${data.username} has answer correctly!`})
+                socket.emit('disable-user-message',{})
+            } else {
+                //if not correct answer just send out message
+                io.in(data.room).emit('client-send-message', {name: data.username, message: data.message})
+            }
         })
 
         //drawing socket
