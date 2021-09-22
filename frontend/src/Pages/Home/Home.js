@@ -24,6 +24,16 @@ export default function Home() {
         })
     })
 
+    useEffect(() => {
+        socket.on("notification", notif => {
+            Toast.fire({
+                title: notif?.title,
+                html: notif?.description,
+                icon: 'info'
+            })
+        })
+    }, [socket])
+
     const username = useRef(null)
     const roomCode = useRef(null)
 
@@ -100,7 +110,7 @@ export default function Home() {
         <div className={styles.box}>
             <Container className={styles.formBox}>
                 <Row>
-                    <h1 style={{ color: 'white', fontWeight: 800}}>Skribbl Ni Ma</h1>
+                    <h1 style={{ color: 'black', fontWeight: 800}}>Skribbl Ni Ma</h1>
                 </Row>
                 <Row>
                     <Col>

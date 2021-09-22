@@ -9,7 +9,6 @@ import styles from './WaitingRoom.module.css'
 import { MainContext } from '../../Context/mainContext';
 import { UsersContext } from '../../Context/usersContext';
 import { SocketContext } from '../../Context/socketContext';
-import Toast from '../../Shared/swal'
 
 const WaitingRoom = withRouter(({ history }) => {
     const { users, setUsers } = useContext(UsersContext)
@@ -19,13 +18,6 @@ const WaitingRoom = withRouter(({ history }) => {
     const socket = useContext(SocketContext)
 
     useEffect(() => {
-        socket.on("notification", notif => {
-            Toast.fire({
-                title: notif?.title,
-                html: notif?.description,
-                icon: 'info'
-            })
-        })
 
         socket.on('client-game-start', () => {
             history.push('/game', {

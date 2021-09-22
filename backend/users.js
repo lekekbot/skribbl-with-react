@@ -13,6 +13,11 @@ const addUser = (id, name, room, host, score, isDrawing) => {
     return { user }
 }
 
+const getRoom = room => {
+    let user = users.find(user => user.room == room)
+    return user
+}
+
 const getUser = id => {
     let user = users.find(user => user.id == id)
     return user
@@ -43,6 +48,17 @@ const getAllCorrect = room => {
         }
     }
     return allcorrect
+}
+
+const getNoOfCorrects = async room => {
+    let list = users.filter(e => e.room == room)
+    let correctUsers = 0
+    for(i of list) {
+        if(i.correct) {
+            correctUsers++
+        }
+    }
+    return correctUsers
 }
 
 const editUser = (id, data) => {
@@ -88,4 +104,4 @@ const getRandomUser = (room) => {
     if(user) return user
 }
 
-module.exports = { addUser, getUser, deleteUser, getUsers, deleteRoom, editUser, getRandomUser, getAllCorrect, getDrawnUsers, resetUsers}
+module.exports = { addUser, getUser, deleteUser, getUsers, deleteRoom, editUser, getRandomUser, getAllCorrect, getDrawnUsers, resetUsers, getRoom, getNoOfCorrects}
