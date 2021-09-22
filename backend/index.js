@@ -28,12 +28,14 @@ const sockets = io => {
             if (error) return callback(error,null)
 
             await socket.join(randomizedCode)
-            io.in(randomizedCode).emit('users', getUsers(randomizedCode))
-
+            
             callback(null, {
                 code: randomizedCode,
                 username: username,
             })
+
+            io.in(randomizedCode).emit('users', getUsers(randomizedCode))
+            io.in(randomizedCode).emit('usernames', getUsers(randomizedCode))
         })
 
         //join room
@@ -45,12 +47,14 @@ const sockets = io => {
             if (error) return callback(error,null)
             
             await socket.join(room)
-            io.in(room).emit('users', getUsers(room))
-
             callback(null, {
                 code: room,
                 username: username,
             })
+
+            io.in(room).emit('users', getUsers(room))
+            io.in(room).emit('usernames', getUsers(room))
+
         })
 
         //start game 
@@ -157,7 +161,7 @@ const sockets = io => {
             if(data.message.toUpperCase() == getSelectedWord(data.room)) {
                 //answers correctly
                 let user = getUser(socket.id)      
-                console.log(user)
+
                 user.correct = true
                 editUser(socket.id, user)
 
@@ -183,9 +187,9 @@ const sockets = io => {
             socket.to(data.room).emit('clear')
         })
 
-        //when user refresh, close browser 
-        socket.on("disconnecting", () => {
+        socket.on('user-quit', () => {
             const user = deleteUser(socket.id)
+
             if (user) {
                 //if host, delete room completely
                 if(user.host) {                
@@ -194,9 +198,30 @@ const sockets = io => {
                     io.in(user.room).emit('remove-room')
                     io.in(user.room).emit('notification', { title: 'Host has left', description: `Start a new game.` })
                 } else {
-                //delete user only 
+                    //delete user only 
                     io.in(user.room).emit('notification', { title: 'Someone just left', description: `${user.name} just left the room` })
                     io.in(user.room).emit('users', getUsers(user.room))
+                    io.in(user.room).emit('usernames', getUsers(user.room))
+                }
+            }
+        })
+
+        //when user refresh, close browser 
+        socket.on("disconnecting", () => {
+            const user = deleteUser(socket.id)
+
+            if (user) {
+                //if host, delete room completely
+                if(user.host) {                
+                    deleteRoom(user.room)
+                    rmvRoom(user.room)
+                    io.in(user.room).emit('remove-room')
+                    io.in(user.room).emit('notification', { title: 'Host has left', description: `Start a new game.` })
+                } else {
+                    //delete user only 
+                    io.in(user.room).emit('notification', { title: 'Someone just left', description: `${user.name} just left the room` })
+                    io.in(user.room).emit('users', getUsers(user.room))
+                    io.in(user.room).emit('usernames', getUsers(user.room))
                 }
             }
         })

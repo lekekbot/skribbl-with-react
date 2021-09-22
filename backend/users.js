@@ -51,7 +51,6 @@ const editUser = (id, data) => {
             e = {...e, ...data};
         }
     });
-    console.log(users);
     return 
 }
 

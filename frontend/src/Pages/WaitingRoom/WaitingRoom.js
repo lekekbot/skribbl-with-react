@@ -22,8 +22,8 @@ const WaitingRoom = withRouter(({ history }) => {
         socket.on("notification", notif => {
             Toast.fire({
                 title: notif?.title,
-                text: notif?.description,
-                status: "success",
+                html: notif?.description,
+                icon: 'info'
             })
         })
 
@@ -36,12 +36,36 @@ const WaitingRoom = withRouter(({ history }) => {
         socket.on('remove-room', () => {
             history.push('/')
         })
+        
+        if(room) {
+            if(host) {
+                socket.emit('game-setup', {
+                    room: room
+                })
+            }
+        } else {
+            // dev will comment off
+            history.push('/')
+        }
     }, [socket])
 
     const startGame = () => {
         socket.emit('start-game', {
             room: room
         })
+    }
+
+    const quit = async () => {
+        await socket.emit('user-quit')
+        history.push('/')
+    }
+
+    const getUsers = () => {
+        return users.length > 0 ?
+            users.map(e => (
+                <Col md={3} className={styles.usersName} key={Math.random()}>{e.name}</Col>
+            ))
+            : ''
     }
 
     //useeffect to get users, on etc. etc.
@@ -55,11 +79,7 @@ const WaitingRoom = withRouter(({ history }) => {
                 <Row className={styles.usersList}>
                     <Col>
                         <Row className={styles.centering}>
-                            {users.length > 0 ?
-                                users.map((e, i) => (
-                                    <Col md={3} className={styles.usersName} key={i}>{e.name}</Col>
-                                ))
-                                : ''}
+                            {getUsers()}
                         </Row>
                     </Col>
                 </Row>
@@ -69,7 +89,7 @@ const WaitingRoom = withRouter(({ history }) => {
                         {host &&
                             <Button className={styles.button} style={{ background: "dodgerblue" }} onClick={() => startGame()}>Start Game</Button>
                         }
-                        <Button className={styles.button} style={{ background: "red" }}>Quit</Button>
+                        <Button className={styles.button} style={{ background: "red" }} onClick={() => quit()}>Quit</Button>
                     </Col>
                 </Row>
             </Container>

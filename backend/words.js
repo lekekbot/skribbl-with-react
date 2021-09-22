@@ -20,7 +20,6 @@ const getWords = (room) => {
 }
 
 const selectedWord = (room, word) => {
-    console.log(rooms)
     rooms[room].selectedWord = word
     return
 }
