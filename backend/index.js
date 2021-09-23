@@ -15,14 +15,21 @@ const {
     getDrawnUsers,
     resetUsers,
     getRoom,
-    getNoOfCorrects
+    getNoOfCorrects,
+    editUserDraw
 } = require('./users');
+
 const {
     getWords,
     rmvRoom,
     selectedWord,
-    getSelectedWord
-} = require('./words');
+    getSelectedWord,
+    setScore,
+    getScore,
+    setTimer,
+    getTimer
+} = require('./room');
+
 const {
     MIN_POINTS,
     MAX_POINTS
@@ -67,7 +74,7 @@ const sockets = io => {
             let room = data.room
             let username = data.username
 
-            let existingRoom = getRoom()
+            let existingRoom = getRoom(room)
             if (!existingRoom) {
                 return socket.emit('notification', {
                     title: 'Room Code Error!',
@@ -104,11 +111,6 @@ const sockets = io => {
             let words = getWords(room)
             await io.in(room).emit('users', getUsers(room))
 
-            selectedUser.isDrawing = true
-            selectedUser.hasDrawn = selectedUser.hasDrawn + 1
-
-            editUser(selectedUser.id, selectedUser)
-
             io.in(room).emit('client-game-setup', {
                 drawer: selectedUser.id,
                 words: words
@@ -120,7 +122,9 @@ const sockets = io => {
                 room,
                 word
             } = data
+  
             let time = 100
+
             let score = MAX_POINTS
             selectedWord(room, word)
 
@@ -129,35 +133,18 @@ const sockets = io => {
             for (i = 0; i < word.length; i++) {
                 noWords += '_'
             }
+            editUserDraw(socket.id)
 
-            let timer = setInterval(async () => {
+            let timer = 0
+            timer =setInterval(async () => {
                 let users = getUsers(room)
                 await io.in(room).emit('users', users)
                 
                 if (time < 80) {
                     score = Math.round(score * (time / 100))
                 }
-                
-                // if all users get correct
-                let allCorrect = getAllCorrect(room)
-                if (allCorrect) {
-                    clearInterval(timer)
-                    let correctUsers = getNoOfCorrects(room)
-                    let drawScore = Math.round((correctUsers/ (users.length - 1)) * MAX_POINTS)
-                    
-                    return io.in(room).emit('round-over', {
-                        word: word
-                    })
-                }
-
-                //game over if timer hits 0
-                if (time == 0) {
-                    clearInterval(timer)
-                    return io.in(room).emit('round-over', {
-                        word: word
-                    })
-
-                } else if (time == Math.floor(99 / 2)) {
+                            
+                if (time == Math.floor(100 / 2)) {
                     //give hint
                     noWords = ''
                     let randomLetter = Math.floor(Math.random() * word.length)
@@ -169,18 +156,46 @@ const sockets = io => {
                         }
                     }
                 }
-                io.in(data.room).emit('time', {
-                    time: time,
+
+                if (getAllCorrect(room)) {
+                    console.log('all correct');
+                     // if all users get correct
+                    stopTimer()
+                    //drawer's score
+                    let correctUsers = getNoOfCorrects(room)
+                    let drawScore = Math.round((correctUsers/ (users.length - 1)) * MAX_POINTS)
+
+                    return io.in(room).emit('round-over', {
+                        word: word
+                    })
+
+                } else if (time == 0) {
+                     //game over if timer hits 0
+                    clearInterval(timer)
+                    console.log('time 0');
+
+                    return io.in(room).emit('round-over', {
+                        word: word
+                    })
+                }
+
+                io.in(room).emit('time', {
+                    time: time--,
                     word: noWords
                 })
-                time--
+                setScore(room, score)
             }, 1000);
-        })
 
+            function stopTimer() {
+                clearInterval(timer)
+            }
+        })
+        
         socket.on('next-round', async (data) => {
             let {
                 room
             } = data
+
             //get x ppl if is drawing
             let drawnUsers = getDrawnUsers(room)
             await resetUsers(room)
@@ -191,17 +206,18 @@ const sockets = io => {
                 return io.in(room).emit('end-game')
             } else {
                 let selectedUser = getRandomUser(room)
-                let words = getWords(room)
-                await io.in(room).emit('users', getUsers(room))
-
-                selectedUser.isDrawing = true
-                selectedUser.hasDrawn = selectedUser.hasDrawn + 1
-                editUser(selectedUser.id, selectedUser)
-
-                io.in(data.room).emit('client-game-setup', {
-                    drawer: selectedUser.id,
-                    words: words
-                })
+                if(selectedUser) {
+                    let words = getWords(room)
+                    
+                    await io.in(room).emit('users', getUsers(room))
+    
+                    io.in(room).emit('client-game-setup', {
+                        drawer: selectedUser.id,
+                        words: words
+                    })
+                } else {
+                    return io.in(room).emit('end-game') 
+                }
             }
         })
 

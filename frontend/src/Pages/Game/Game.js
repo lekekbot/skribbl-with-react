@@ -24,8 +24,10 @@ const Game = withRouter(({ history }) => {
     const msg = useRef(null)
     const [msgDisable, setmsgDisable] = useState(false)
     const [showWord, setshowWord] = useState('')
-
+    const [drawer, setdrawer] = useState('')
+    
     useEffect(() => {
+        let draw = ''
         socket.on('client-send-message', (data) => {
             setMessages(prevState => [...prevState, { name: data.name, message: data.message }])
         })
@@ -45,7 +47,10 @@ const Game = withRouter(({ history }) => {
         socket.on('client-game-setup', (data) => {
             setwordSelection([])
             setmsgDisable(false)
-            if (socket.id == data.drawer) {
+            setTimer(100)
+            setdrawer(data.drawer)
+            draw = data.drawer
+            if(socket.id == data.drawer) {
                 setwordSelection(data.words[0])
                 setmsgDisable(true)
             }
@@ -60,9 +65,11 @@ const Game = withRouter(({ history }) => {
             setshowWord(`The word is: ${data.word}`)
             setTimeout(() => {
                 setshowWord('')
-                socket.emit('next-round', {
-                    room: room
-                })
+                if(socket.id == draw) {
+                    socket.emit('next-round', {
+                        room: room
+                    })
+                }
             }, 2000);
         })
 
@@ -70,8 +77,11 @@ const Game = withRouter(({ history }) => {
             console.log('game ended bitch')
         })
 
-        if (room) {
-            if (host) {
+    }, [socket])
+
+    useEffect(() => {
+        if(room) {
+            if(host) {
                 socket.emit('game-setup', {
                     room: room
                 })
@@ -80,7 +90,7 @@ const Game = withRouter(({ history }) => {
             // dev will comment off
             history.push('/')
         }
-    }, [socket])
+    }, [])
 
     const sendMessage = e => {
         if (e.key !== 'Enter') return
@@ -98,10 +108,13 @@ const Game = withRouter(({ history }) => {
 
     const selectedWord = word => {
         setwordSelection([])
-        socket.emit('start-round', {
-            room: room,
-            word: word
-        })
+        if(socket.id == drawer) {
+            console.log('here')
+            socket.emit('start-round', {
+                room: room,
+                word: word
+            })
+        }
     }
 
     const chatMessages = messages.map((e, i) => (

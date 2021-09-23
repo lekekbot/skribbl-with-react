@@ -18,6 +18,7 @@ const WaitingRoom = withRouter(({ history }) => {
     const socket = useContext(SocketContext)
 
     useEffect(() => {
+        let proc = 0
 
         socket.on('client-game-start', () => {
             history.push('/game', {
@@ -29,13 +30,7 @@ const WaitingRoom = withRouter(({ history }) => {
             history.push('/')
         })
         
-        if(room) {
-            if(host) {
-                socket.emit('game-setup', {
-                    room: room
-                })
-            }
-        } else {
+        if(!room) {
             // dev will comment off
             history.push('/')
         }
