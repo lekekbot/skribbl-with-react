@@ -110,7 +110,7 @@ export default function Home() {
         <div className={styles.box}>
             <Container className={styles.formBox}>
                 <Row>
-                    <h1 style={{ color: 'black', fontWeight: 800}}>Skribbl Ni Ma</h1>
+                    <h1 className={styles.textHeader}>Skribbl Ni Ma</h1>
                 </Row>
                 <Row>
                     <Col>
