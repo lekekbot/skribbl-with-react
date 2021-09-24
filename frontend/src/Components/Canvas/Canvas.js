@@ -90,11 +90,16 @@ export default function Canvas(props) {
     }
 
     const mouseDraw = ({ nativeEvent }) => {
-        const { screenX, clientY } = nativeEvent
-        let a = canvasRef.current.parentNode.parentNode.clientWidth
-        let b = windowW
-        let c = (b - a)/2
-        draw(screenX - c , clientY)
+        const { screenX, clientY, screenY, clientX } = nativeEvent
+        let quack = document.getElementById('canvas').getBoundingClientRect();
+
+        // let a = canvasRef.current.parentNode.parentNode.clientWidth
+        // let b = windowW
+        // let c = (b - a)/2
+        let x = clientX - quack.left
+        let y = clientY - quack.top
+
+        draw(x , y)
     }
 
     function testing() {
@@ -106,8 +111,8 @@ export default function Canvas(props) {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
 
-        canvas.width = canvasRef.current.parentNode.parentNode.clientWidth
-        canvas.height = canvasRef.current.parentNode.parentNode.parentNode.parentNode.clientHeight - 200
+        canvas.width = canvasRef.current.parentNode.parentNode.clientHeight - 120
+        canvas.height = canvasRef.current.parentNode.parentNode.clientHeight - 120
 
         ctx.fillStyle = "white";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -149,8 +154,7 @@ export default function Canvas(props) {
     }, [socket, canvasRef])
 
     return (
-        <Container className={styles.canvasBox}>
-            <div>
+        <div className={styles.canvasBox}>
                 <canvas
                     id="canvas"
                     className={styles.canvas}
@@ -160,7 +164,6 @@ export default function Canvas(props) {
                     onMouseUp={endPosition}
                     onMouseMove={mouseDraw}
                 />
-            </div>
             <Row className={styles.canvasTools}>
                 <Col md={6}>
                     <Button onClick={() => setsize(25)} className={styles.button}>
@@ -202,6 +205,6 @@ export default function Canvas(props) {
 
                 </Col>
             </Row>
-        </Container>
+        </div>
     )
 }

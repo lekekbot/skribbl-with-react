@@ -251,6 +251,7 @@ const sockets = io => {
 
         //drawing socket
         socket.on('send-drawing', async (data) => {
+            console.log(data)
             socket.to(data.room).emit('drawing', {
                 x: data.x,
                 y: data.y,
