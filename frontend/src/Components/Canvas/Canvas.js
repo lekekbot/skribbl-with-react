@@ -84,7 +84,7 @@ export default function Canvas(props) {
                 y: y,
                 size: size,
                 color: color,
-                room: room
+                room: room,
             })
         }
     }
@@ -111,8 +111,8 @@ export default function Canvas(props) {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
 
-        canvas.width = canvasRef.current.parentNode.parentNode.clientHeight - 120
-        canvas.height = canvasRef.current.parentNode.parentNode.clientHeight - 120
+        canvas.width = canvasRef.current.parentNode.parentNode.parentNode.clientHeight - 120
+        canvas.height = canvasRef.current.parentNode.parentNode.parentNode.clientHeight - 120
 
         ctx.fillStyle = "white";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -134,7 +134,11 @@ export default function Canvas(props) {
             contextRef.current.moveTo(data.x, data.y);
         })
 
-        socket.on('clear', () => {
+        socket.on('clear', (data) => {
+            if(data.scale) {
+                console.log('im here');
+                contextRef.current.setTransform(1, 0, 0, 1, 0, 0);
+            }
             contextRef.current.fillStyle = "white";
             contextRef.current.fillRect(0, 0, canvas.width, canvas.height);
         })
@@ -147,9 +151,24 @@ export default function Canvas(props) {
         socket.on('client-game-setup', (data) => {
             if (socket.id == data.drawer) {
                 setdrawer(false)
+                console.log('yes oks');
+                contextRef.current.setTransform(1, 0, 0, 1, 0, 0);
+                socket.emit('scale-setup', {
+                    room: room,
+                    width: document.getElementById('canvas').getAttribute('width'),
+                    height: document.getElementById('canvas').getAttribute('height')
+                })
             } else {
                 setdrawer(true)
             }
+        })
+
+        socket.on('setup-scale', (data) => {
+            console.log('proc');
+            let width = (document.getElementById('canvas').getAttribute('width') / data.width) 
+            let height = (document.getElementById('canvas').getAttribute('height') / data.height) 
+            
+            contextRef.current.scale(width, height)
         })
     }, [socket, canvasRef])
 

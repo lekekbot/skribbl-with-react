@@ -88,7 +88,7 @@ const Game = withRouter(({ history }) => {
             }
         } else {
             // dev will comment off
-            history.push('/')
+            // history.push('/')
         }
     }, [])
 

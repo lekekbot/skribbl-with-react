@@ -199,7 +199,7 @@ const sockets = io => {
             //get x ppl if is drawing
             let drawnUsers = getDrawnUsers(room)
             await resetUsers(room)
-            socket.to(room).emit('clear')
+            socket.in(room).emit('clear', {scale: true})
             socket.to(room).emit('clear-chat')
 
             if (drawnUsers) {
@@ -249,6 +249,11 @@ const sockets = io => {
             }
         })
 
+        //canvas scaling setup
+        socket.on('scale-setup', async (data) => {
+            io.to(data.room).emit('setup-scale', data)
+        })
+
         //drawing socket
         socket.on('send-drawing', async (data) => {
             console.log(data)
@@ -256,7 +261,9 @@ const sockets = io => {
                 x: data.x,
                 y: data.y,
                 size: data.size,
-                color: data.color
+                color: data.color,
+                width: data.width,
+                height: data.height
             })
         })
 
