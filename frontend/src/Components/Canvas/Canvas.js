@@ -31,7 +31,8 @@ export default function Canvas(props) {
     function handleCanvasClear() {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         socket.emit('clear-drawing', {
             room: room
         })
@@ -127,7 +128,7 @@ export default function Canvas(props) {
 
     return (
         <Container className={styles.canvasBox}>
-            <Row>
+            <div>
                 <canvas
                     id="canvas"
                     className={styles.canvas}
@@ -137,7 +138,7 @@ export default function Canvas(props) {
                     onMouseUp={endPosition}
                     onMouseMove={mouseDraw}
                 />
-            </Row>
+            </div>
             <Row className={styles.canvasTools}>
                 <Col md={6}>
                     <Button onClick={() => setsize(25)} className={styles.button}>

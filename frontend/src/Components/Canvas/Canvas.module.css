@@ -1,15 +1,13 @@
 .canvasBox {
     width: 100%;
     text-align: center;
-    background-color: tomato;
 }
 
 .canvas {    
-
+    margin: auto;
 }
 
 .canvasTools {
-    margin: 0;
     background-color: white;
 }
 
