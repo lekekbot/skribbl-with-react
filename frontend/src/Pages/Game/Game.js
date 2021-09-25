@@ -1,5 +1,5 @@
 import React, { useState, useContext, useRef, useEffect } from 'react'
-import { Col, Row, Container } from 'react-bootstrap'
+import { Col, Row, Container, ProgressBar } from 'react-bootstrap'
 import { withRouter } from 'react-router';
 
 //style
@@ -25,7 +25,7 @@ const Game = withRouter(({ history }) => {
     const [msgDisable, setmsgDisable] = useState(false)
     const [showWord, setshowWord] = useState('')
     const [drawer, setdrawer] = useState('')
-    
+
     useEffect(() => {
         let draw = ''
         socket.on('client-send-message', (data) => {
@@ -50,7 +50,7 @@ const Game = withRouter(({ history }) => {
             setTimer(100)
             setdrawer(data.drawer)
             draw = data.drawer
-            if(socket.id == data.drawer) {
+            if (socket.id == data.drawer) {
                 setwordSelection(data.words[0])
                 setmsgDisable(true)
             }
@@ -65,7 +65,7 @@ const Game = withRouter(({ history }) => {
             setshowWord(`The word is: ${data.word}`)
             setTimeout(() => {
                 setshowWord('')
-                if(socket.id == draw) {
+                if (socket.id == draw) {
                     socket.emit('next-round', {
                         room: room
                     })
@@ -80,8 +80,8 @@ const Game = withRouter(({ history }) => {
     }, [socket])
 
     useEffect(() => {
-        if(room) {
-            if(host) {
+        if (room) {
+            if (host) {
                 socket.emit('game-setup', {
                     room: room
                 })
@@ -108,7 +108,7 @@ const Game = withRouter(({ history }) => {
 
     const selectedWord = word => {
         setwordSelection([])
-        if(socket.id == drawer) {
+        if (socket.id == drawer) {
             console.log('here')
             socket.emit('start-round', {
                 room: room,
@@ -123,9 +123,10 @@ const Game = withRouter(({ history }) => {
 
     const getScore = users.map((e, i) => (
         <li key={i} className={styles.score}>
-            <div className={styles.scoreRow}><b>{e.name}</b>
-                {e.isDrawing ? <>NYESS</> : ''}
-                <span className={styles.scoreScore}>{e.score}</span></div>
+            <div className={e.isDrawing ? styles.scoreRowDrawing : styles.scoreRow}>
+                <div>{e.name}</div>
+                <div>Score: {e.score}</div>
+            </div>
         </li>
     ))
 
@@ -139,35 +140,32 @@ const Game = withRouter(({ history }) => {
         <div className={styles.box}>
             <Container>
                 <Row>
+                    <Col xs={2}>
+                        <h1 className={styles.scoreHeader}>Scores</h1>
+                    </Col>
+                    <Col xs={7}>
+                        <div className={styles.top}>
+                            <ProgressBar className={styles.word} animated now={timer} label={`${word}`} />
+                        </div>
+                    </Col>
+                    <Col xs={3}>
+                        <h1 className={styles.scoreHeader}>Chat</h1>
+                    </Col>
+                </Row>
+                <Row>
                     <Col xs={2} style={{ maxHeight: '100%' }}>
-                        <h1>Score</h1>
-                        <ul className={styles.chatMessages}>
-                            {/* scorboard, map it */}
+                        <ul className={styles.scoreboard}>
                             {getScore}
                         </ul>
                     </Col>
-                    <Col xs={8} style={{maxHeight: '100%'}}>
-                        {/* word thing */}
-                        <div className={styles.top}>
-                            {/* timer */}
-                            <div className={styles.timer}>Time Left: {timer}</div>
-
-                            {/* word */}
-                            <div className={styles.word}>{word}</div>
-                        </div>
-
+                    <Col xs={7} style={{ padding: 0, margin: 0 }}>
                         {/* /canvas */}
                         <div className={styles.canvas}>
                             <Canvas />
                         </div>
                     </Col>
-                    <Col xs={2} className={styles.chat} style={{ maxHeight: '100%' }}>
-                        {/* chat box */}
-                        <h1>Chat</h1>
-
-                        {/* messages */}
+                    <Col xs={3} className={styles.chat} style={{ maxHeight: '100%' }}>
                         <div className={styles.chatMessages}>{chatMessages}</div>
-
                         <input type="text" ref={msg} onKeyDown={e => sendMessage(e)} disabled={msgDisable} />
                     </Col>
                 </Row>

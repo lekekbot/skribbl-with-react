@@ -111,8 +111,8 @@ export default function Canvas(props) {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
 
-        canvas.width = canvasRef.current.parentNode.parentNode.parentNode.clientHeight - 120
-        canvas.height = canvasRef.current.parentNode.parentNode.parentNode.clientHeight - 120
+        canvas.width = canvasRef.current.parentNode.parentNode.parentNode.clientWidth
+        canvas.height = canvasRef.current.parentNode.parentNode.parentNode.clientHeight - 100
 
         ctx.fillStyle = "white";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
