@@ -109,7 +109,6 @@ const Game = withRouter(({ history }) => {
     const selectedWord = word => {
         setwordSelection([])
         if (socket.id == drawer) {
-            console.log('here')
             socket.emit('start-round', {
                 room: room,
                 word: word

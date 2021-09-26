@@ -102,10 +102,6 @@ export default function Canvas(props) {
         draw(x, y)
     }
 
-    function testing() {
-        console.log(windowW)
-    }
-
     //canvas settings
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -134,13 +130,14 @@ export default function Canvas(props) {
             contextRef.current.moveTo(data.x, data.y);
         })
 
-        socket.on('clear', (data) => {
-            if (data.scale) {
-                console.log('im here');
+        socket.on('clear', () => {
+            try {
                 contextRef.current.setTransform(1, 0, 0, 1, 0, 0);
+                contextRef.current.fillStyle = "white";
+                contextRef.current.fillRect(0, 0, canvas.width, canvas.height);
+            } catch (error) {
+                console.log(error)
             }
-            contextRef.current.fillStyle = "white";
-            contextRef.current.fillRect(0, 0, canvas.width, canvas.height);
         })
 
         socket.on('mouseUp', () => {
@@ -151,8 +148,13 @@ export default function Canvas(props) {
         socket.on('client-game-setup', (data) => {
             if (socket.id == data.drawer) {
                 setdrawer(false)
-                console.log('yes oks');
                 contextRef.current.setTransform(1, 0, 0, 1, 0, 0);
+                contextRef.current.fillStyle = "white";
+                contextRef.current.fillRect(0, 0, canvas.width, canvas.height);
+                console.log(canvas.width)
+                console.log(canvas.height)
+                console.log('cleared2');
+
                 socket.emit('scale-setup', {
                     room: room,
                     width: document.getElementById('canvas').getAttribute('width'),
@@ -164,7 +166,6 @@ export default function Canvas(props) {
         })
 
         socket.on('setup-scale', (data) => {
-            console.log('proc');
             let width = (document.getElementById('canvas').getAttribute('width') / data.width)
             let height = (document.getElementById('canvas').getAttribute('height') / data.height)
 

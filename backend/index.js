@@ -199,8 +199,9 @@ const sockets = io => {
             //get x ppl if is drawing
             let drawnUsers = getDrawnUsers(room)
             await resetUsers(room)
-            socket.in(room).emit('clear', {scale: true})
-            socket.to(room).emit('clear-chat')
+            console.log('room')
+            io.in(room).emit('clear')
+            io.in(room).emit('clear-chat')
 
             if (drawnUsers) {
                 return io.in(room).emit('end-game')
