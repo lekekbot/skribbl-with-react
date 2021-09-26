@@ -138,7 +138,7 @@ const Game = withRouter(({ history }) => {
 
     return (
         <div className={styles.box}>
-            <Container>
+            <Container className={styles.gameBox}>
                 <Row>
                     <Col xs={2}>
                         <h1 className={styles.scoreHeader}>Scores</h1>
@@ -164,9 +164,9 @@ const Game = withRouter(({ history }) => {
                             <Canvas />
                         </div>
                     </Col>
-                    <Col xs={3} className={styles.chat} style={{ maxHeight: '100%' }}>
+                    <Col xs={3} className={styles.chat}>
                         <div className={styles.chatMessages}>{chatMessages}</div>
-                        <input type="text" ref={msg} onKeyDown={e => sendMessage(e)} disabled={msgDisable} />
+                        <input className={styles.chatInput} type="text" ref={msg} onKeyDown={e => sendMessage(e)} disabled={msgDisable} />
                     </Col>
                 </Row>
             </Container>
