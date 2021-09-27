@@ -136,15 +136,20 @@ const sockets = io => {
             editUserDraw(socket.id)
 
             let timer = 0
-            timer =setInterval(async () => {
+            timer = setInterval(async () => {
                 let users = getUsers(room)
                 await io.in(room).emit('users', users)
-                
-                if (time < 80) {
-                    score = Math.round(score * (time / 100))
+                let correctUsers = getNoOfCorrects(room)
+
+                if(score <= MIN_POINTS) {
+                    score = MIN_POINTS
+                } else {
+                    score = Math.round(MAX_POINTS * (time / 80) * (correctUsers / users.length))
                 }
-                            
-                if (time == Math.floor(100 / 2)) {
+
+                setScore(room, score)
+                                            
+                if (time == 60) {
                     //give hint
                     noWords = ''
                     let randomLetter = Math.floor(Math.random() * word.length)
@@ -155,6 +160,21 @@ const sockets = io => {
                             noWords += '_'
                         }
                     }
+                } else if(time == 40) {
+                    let duped = true
+                    let randomLetter 
+                    while(duped) {
+                        randomLetter = Math.floor(Math.random() * word.length)
+                        if(noWords.charAt(randomLetter) == '_') {
+                            duped = false
+                        }
+                    }
+
+                    for (i = 0; i < word.length; i++) {
+                        if (i == randomLetter) {
+                            noWords = setCharAt(noWords, i, word[i])
+                        }
+                    }
                 }
 
                 if (getAllCorrect(room)) {
@@ -162,8 +182,6 @@ const sockets = io => {
                      // if all users get correct
                     stopTimer()
                     //drawer's score
-                    let correctUsers = getNoOfCorrects(room)
-                    let drawScore = Math.round((correctUsers/ (users.length - 1)) * MAX_POINTS)
 
                     return io.in(room).emit('round-over', {
                         word: word
@@ -183,7 +201,6 @@ const sockets = io => {
                     time: time--,
                     word: noWords
                 })
-                setScore(room, score)
             }, 1000);
 
             function stopTimer() {
@@ -199,7 +216,6 @@ const sockets = io => {
             //get x ppl if is drawing
             let drawnUsers = getDrawnUsers(room)
             await resetUsers(room)
-            console.log('room')
             io.in(room).emit('clear')
             io.in(room).emit('clear-chat')
 
@@ -235,12 +251,16 @@ const sockets = io => {
                 let user = getUser(socket.id)
 
                 user.correct = true
+                user.score = getScore(room)
+
                 editUser(socket.id, user)
 
                 io.in(room).emit('client-correct', {
                     message: `${username} has answer correctly!`
                 })
+                io.in(room).emit('users', getUsers(room))
                 socket.emit('disable-user-message', {})
+
             } else {
                 //if not correct answer just send out message
                 io.in(room).emit('client-send-message', {
@@ -257,7 +277,6 @@ const sockets = io => {
 
         //drawing socket
         socket.on('send-drawing', async (data) => {
-            console.log(data)
             socket.to(data.room).emit('drawing', {
                 x: data.x,
                 y: data.y,
@@ -348,3 +367,9 @@ server.listen(8000, err => {
     if (err) return console.log(`Cannot Listen on PORT: 8000`);
     console.log(`Server is Listening on: http://localhost:8000/`);
 });
+
+
+function setCharAt(str,index,chr) {
+    if(index > str.length-1) return str;
+    return str.substring(0,index) + chr + str.substring(index+1);
+}

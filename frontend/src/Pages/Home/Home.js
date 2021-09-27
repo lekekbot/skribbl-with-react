@@ -20,6 +20,10 @@ export default function Home() {
 
     useEffect(() => {
         socket.on("users", users => {
+            users.sort(function(a, b) {
+                return b.score - a.score;
+              });
+              console.log(users)
             setUsers(users)
         })
     })

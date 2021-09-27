@@ -18,7 +18,6 @@ export default function Canvas(props) {
     const [color, setcolor] = useState('black')
     const [size, setsize] = useState(10)
     const [drawing, setdrawing] = useState(false)
-    const [sendingDraw, setsendingDraw] = useState(false)
     const [drawer, setdrawer] = useState(false)
     const [windowSize, setWindowSize] = useState([window.innerWidth, window.innerHeight]);
     useEffect(() => {
@@ -32,15 +31,6 @@ export default function Canvas(props) {
     }, []);
 
     const [windowW, windowH] = windowSize
-
-    //brush settings
-    // function handleBrushSize(size) {
-    //     brushSize = size;
-    // }
-    // function handleBrushColor(color) {
-    //     brushColor = color;
-    //     console.log(brushColor)
-    // }
 
     function handleCanvasClear() {
         const canvas = canvasRef.current;
@@ -90,14 +80,11 @@ export default function Canvas(props) {
     }
 
     const mouseDraw = ({ nativeEvent }) => {
-        const { screenX, clientY, screenY, clientX } = nativeEvent
-        let quack = document.getElementById('canvas').getBoundingClientRect();
+        const { clientY, clientX } = nativeEvent
+        let boudnary = document.getElementById('canvas').getBoundingClientRect();
 
-        // let a = canvasRef.current.parentNode.parentNode.clientWidth
-        // let b = windowW
-        // let c = (b - a)/2
-        let x = clientX - quack.left
-        let y = clientY - quack.top
+        let x = clientX - boudnary.left
+        let y = clientY - boudnary.top
 
         draw(x, y)
     }

@@ -75,6 +75,7 @@ const Game = withRouter(({ history }) => {
 
         socket.on('end-game', () => {
             console.log('game ended bitch')
+            
         })
 
     }, [socket])
