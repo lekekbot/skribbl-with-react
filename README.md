@@ -5,7 +5,6 @@ This project showcases our work in year 2 of our studies in Information Technolo
 ## Table of Content:
 * [About the Project](#About-the-Project)
 * [Installation Guide](#Installation)
-* [Technologies](#Technologies)
 
 # About the Project:
 This is a skribbl.io clone created during our holidays.
